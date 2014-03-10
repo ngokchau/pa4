@@ -33,6 +33,7 @@ namespace WebRole
         private static CloudQueue cmdQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlercmd");
         private static CloudQueue urlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlerurl");
         private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
+        private static CloudTable statsTable = storageAccount.CreateCloudTableClient().GetTableReference("statstable");
 
         [WebMethod]
         public void BuildTrie()
@@ -50,7 +51,6 @@ namespace WebRole
         }
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public List<string> Search(string input)
         {
             if (trie == null)
@@ -59,6 +59,22 @@ namespace WebRole
             }
             trie.Search(input);
             return trie.Suggestions;
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string GetNoWordsInTrie()
+        {
+            statsTable.CreateIfNotExists();
+            TableQuery<Stats> query = new TableQuery<Stats>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "trie"));
+
+            string result = "0";
+            foreach (Stats stat in statsTable.ExecuteQuery(query))
+            {
+                result = stat.wordCounter;
+            }
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]

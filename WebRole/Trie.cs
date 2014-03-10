@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -10,6 +13,9 @@ namespace WebRole
     {
         private Node root;
         private List<string> suggestions = new List<string>();
+        private static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["StorageConnectionString"]);
+        private static CloudTable statsTable = storageAccount.CreateCloudTableClient().GetTableReference("statstable");
+        private int counter = 0;
 
         public Trie()
         {
@@ -48,6 +54,8 @@ namespace WebRole
             else
             {
                 current.isWord = true;
+                TableOperation word = TableOperation.InsertOrReplace(new Stats("trie", counter++.ToString()));
+                statsTable.Execute(word);
             }
         }
 

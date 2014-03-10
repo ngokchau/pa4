@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -20,7 +21,23 @@ namespace WorkerRole
         private static CloudTable index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
         private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
 
-        public Crawler() { }
+        public Crawler(string baseUrl) {
+            if (urlQueue.PeekMessage() == null)
+            {
+                string xmlDocs = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/[a-zA-Z0-9\/\-]+(\.xml)$";
+                WebRequest request = WebRequest.Create(baseUrl + "/robots.txt");
+                StreamReader sr = new StreamReader(request.GetResponse().GetResponseStream());
+
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    if (Regex.Match(line.Substring(9), xmlDocs).Success)
+                    {
+                        ParseSitemap(line.Substring(9));
+                    }
+                }
+            }
+        }
 
         public void ParseSitemap(string xml)
         {

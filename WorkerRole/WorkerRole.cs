@@ -33,23 +33,7 @@ namespace WorkerRole
             urlQueue.CreateIfNotExists();
             errorQueue.CreateIfNotExists();
 
-            Crawler crawler = new Crawler();
-
-            if (urlQueue.PeekMessage() == null)
-            {
-                string xmlRegex = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/[a-zA-Z0-9\/\-]+(\.xml)$";
-                WebRequest request = WebRequest.Create("http://www.cnn.com/robots.txt");
-                StreamReader sr = new StreamReader(request.GetResponse().GetResponseStream());
-
-                while (!sr.EndOfStream)
-                {
-                    string line = sr.ReadLine();
-                    if (Regex.Match(line.Substring(9), xmlRegex).Success)
-                    {
-                        crawler.ParseSitemap(line.Substring(9));
-                    }
-                }
-            }
+            Crawler crawler = new Crawler("http://www.cnn.com");
 
             while (true)
             {

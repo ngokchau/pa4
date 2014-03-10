@@ -24,6 +24,7 @@
 function loop() {
     GetPerformance("Memory", "Available MBytes", "");
     GetPerformance("Processor", "% Processor Time", "_Total");
+    GetNoWordsInTrie();
     GetStateOfWorker();
     ToggleBuildTrie();
     GetUrlQueueSize();
@@ -54,6 +55,18 @@ function BuildTrie() {
 
 function ToggleBuildTrie() {
     ($("#ram").html() < 200) ? $("#buildTrie").addClass("disabled") : $("#buildTrie").removeClass("disabled");
+}
+
+function GetNoWordsInTrie() {
+    $.ajax({
+        type: "POST",
+        url: "admin.asmx/GetNoWordsInTrie",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            $("#noWordsInTrie").html(JSON.parse(data.d));
+        }
+    });
 }
 
 function GetStateOfWorker() {
