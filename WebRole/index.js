@@ -1,8 +1,13 @@
 ﻿$(document).ready(function () {
     $("#input").on("keyup", function () {
-        QuerySuggestion();
+        Search();
+        //QuerySuggestion();
         QueryAws();
     });
+
+    $("#search").click(function () {
+        Search();
+    })
 });
 
 function QueryAws() {
@@ -27,7 +32,7 @@ function QuerySuggestion() {
     var input = $("#input").val().trim();
     $.ajax({
         type: "POST",
-        url: "admin.asmx/Search",
+        url: "admin.asmx/Suggest",
         data: JSON.stringify({ input: input }),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
@@ -37,10 +42,33 @@ function QuerySuggestion() {
                 for (var i = 0; i < data.d.length; i++) {
                     result += data.d[i] + "<br />";
                 }
-                $("#urlResult").html(result);
+                $("#suggestion").html(result);
             }
             else {
-                $("#urlResult").html("");
+                $("#suggestion").html("");
+            }
+        }
+    });
+}
+
+function Search() {
+    var input = $("#input").val().trim();
+    $.ajax({
+        type: "POST",
+        url: "admin.asmx/Search",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({ input: input }),
+        dataType: "json",
+        success: function (data) {
+            var result = "";
+            if (input != "" && input != " ") {
+                for (var key in data) {
+                    result += data[key] + "<br />";
+                }
+                $("#searchResult").html(result);
+            }
+            else {
+                $("#searchResult").html("");
             }
         }
     });

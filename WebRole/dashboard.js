@@ -10,6 +10,9 @@
     $("#stopCrawler").click(function () {
         AddCommand("stop");
     });
+    $("#loadUrlQueue").click(function () {
+        AddCommand("load");
+    })
     $("#clearUrlQueue").click(function () {
         ClearUrlQueue();
     });
@@ -28,7 +31,8 @@ function loop() {
     GetStateOfWorker();
     ToggleBuildTrie();
     GetUrlQueueSize();
-    GetErrors();
+    GetLastTen("errors");
+    GetLastTen("urls");
     setTimeout('loop()', 1000);
 }
 
@@ -75,7 +79,13 @@ function GetStateOfWorker() {
         url: "admin.asmx/GetStateOfWorker",
         contentType: "application/json; charset=utf-8",
         success: function (data) {
-            (JSON.parse(data.d) == "start") ? $("#crawlerState").html("crawling") : $("#crawlerState").html("idle");
+            if (JSON.parse(data.d) == "start") {
+                $("#crawlerState").html("crawling")
+            } else if (JSON.parse(data.d) == "stop") {
+                $("#crawlerState").html("idle");
+            } else {
+                $("#crawlerState").html("loading");
+            }
         }
     });
 }
@@ -109,10 +119,11 @@ function ClearUrlQueue() {
     });
 }
 
-function GetErrors() {
+function GetLastTen(type) {
     $.ajax({
         type: "POST",
-        url: "admin.asmx/GetErrors",
+        url: "admin.asmx/GetLastTen",
+        data: JSON.stringify({ type: type }),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -120,7 +131,7 @@ function GetErrors() {
             for (var i = 0; i < data.d.length; i++) {
                 result += data.d[i] + "<br />";
             }
-            $("#errors").html(result);
+            (type == "errors") ? $("#errors").html(result) : $("#urlsCrawled").html(result) ;
         }
     });
 }

@@ -54,8 +54,8 @@ namespace WebRole
             else
             {
                 current.isWord = true;
-                TableOperation word = TableOperation.InsertOrReplace(new Stats("trie", counter++.ToString()));
-                statsTable.Execute(word);
+                //TableOperation word = TableOperation.InsertOrReplace(new Stats("trie", counter++.ToString()));
+                //statsTable.Execute(word);
             }
         }
 

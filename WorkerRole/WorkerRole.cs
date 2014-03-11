@@ -23,6 +23,9 @@ namespace WorkerRole
         private static CloudQueue cmdQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlercmd");
         private static CloudQueue urlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlerurl");
         private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
+        private static CloudQueue lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
+        private static CloudTable index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
+        private static HashSet<string> visisted = new HashSet<string>();
 
         public override void Run()
         {
@@ -32,8 +35,11 @@ namespace WorkerRole
             cmdQueue.CreateIfNotExists();
             urlQueue.CreateIfNotExists();
             errorQueue.CreateIfNotExists();
+            lastTenUrlQueue.CreateIfNotExists();
 
-            Crawler crawler = new Crawler("http://www.cnn.com");
+            Crawler crawler = new Crawler();
+            cmdQueue.Clear();
+            cmdQueue.AddMessage(new CloudQueueMessage("stop"));
 
             while (true)
             {
@@ -45,9 +51,19 @@ namespace WorkerRole
                 {
                     continue;
                 }
+                else if (cmd.AsString == "start")
+                {
+                    CloudQueueMessage url = urlQueue.GetMessage();
+                    if (!visisted.Contains(url.AsString))
+                    {
+                        crawler.Crawl(url.AsString);
+                        visisted.Add(url.AsString);
+                    }
+                    urlQueue.DeleteMessage(url);
+                }
                 else
                 {
-
+                    crawler.LoadQueue("http://www.cnn.com");
                 }
             }
         }

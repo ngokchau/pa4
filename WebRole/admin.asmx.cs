@@ -33,7 +33,8 @@ namespace WebRole
         private static CloudQueue cmdQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlercmd");
         private static CloudQueue urlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlerurl");
         private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
-        private static CloudTable statsTable = storageAccount.CreateCloudTableClient().GetTableReference("statstable");
+        private static CloudQueue lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
+        private static CloudTable index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
 
         [WebMethod]
         public void BuildTrie()
@@ -51,7 +52,7 @@ namespace WebRole
         }
 
         [WebMethod]
-        public List<string> Search(string input)
+        public List<string> Suggest(string input)
         {
             if (trie == null)
             {
@@ -63,19 +64,34 @@ namespace WebRole
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public string GetNoWordsInTrie()
+        public List<string> Search(string input)
         {
-            statsTable.CreateIfNotExists();
-            TableQuery<Stats> query = new TableQuery<Stats>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "trie"));
-
-            string result = "0";
-            foreach (Stats stat in statsTable.ExecuteQuery(query))
+            TableQuery<Result> query = new TableQuery<Result>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, input));
+            List<string> results = new List<string>();
+            
+            foreach (Result result in index.ExecuteQuery(query))
             {
-                result = stat.wordCounter;
+                results.Add(HttpUtility.UrlDecode(result.url));
             }
 
-            return new JavaScriptSerializer().Serialize(result);
+            return results;
         }
+
+        //[WebMethod]
+        //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        //public string GetNumbUrlCrawled()
+        //{
+        //    statTable.CreateIfNotExists();
+        //    TableQuery<Stat> query = new TableQuery<Stat>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "numburlcrawled"));
+
+        //    string result = "0";
+        //    foreach (Stat stat in statTable.ExecuteQuery(query))
+        //    {
+        //        result = stat.counter;
+        //    }
+
+        //    return new JavaScriptSerializer().Serialize(result);
+        //}
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -94,7 +110,19 @@ namespace WebRole
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string GetStateOfWorker()
         {
-            return new JavaScriptSerializer().Serialize((cmdQueue.PeekMessage() != null) ? cmdQueue.PeekMessage().AsString : "stop");
+            try { 
+                return new JavaScriptSerializer().Serialize((cmdQueue.PeekMessage() != null) ? cmdQueue.PeekMessage().AsString : "stop");
+            }
+            catch (Exception e)
+            {
+                errorQueue.FetchAttributes();
+                if (errorQueue.ApproximateMessageCount >= 10)
+                {
+                    errorQueue.DeleteMessage(errorQueue.GetMessage());
+                }
+                errorQueue.AddMessage(new CloudQueueMessage(e.Message + " " + DateTime.UtcNow));
+                return new JavaScriptSerializer().Serialize("stop");
+            }
         }
 
         [WebMethod]
@@ -120,18 +148,17 @@ namespace WebRole
         }
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public List<string> GetErrors()
+        public List<string> GetLastTen(string type)
         {
-            IEnumerable<CloudQueueMessage> msgs = errorQueue.PeekMessages(10);
-            List<string> errors = new List<string>();
+            IEnumerable<CloudQueueMessage> msgs = (type == "errors") ? errorQueue.PeekMessages(10) : lastTenUrlQueue.PeekMessages(10);
+            List<string> results = new List<string>();
 
             foreach (CloudQueueMessage msg in msgs)
             {
-                errors.Add(msg.AsString);
+                results.Add(msg.AsString);
             }
 
-            return errors;
+            return results;
         }
 
         [WebMethod]
