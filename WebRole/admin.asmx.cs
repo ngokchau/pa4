@@ -49,7 +49,7 @@ namespace WebRole
             int lineCounter = 1;
             string lastLine = "...";
 
-            while (!sr.EndOfStream && (lineCounter % 25000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 50))
+            while (!sr.EndOfStream && (lineCounter % 25000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 60))
             {
                 lastLine = sr.ReadLine();
                 trie.Insert(lastLine);

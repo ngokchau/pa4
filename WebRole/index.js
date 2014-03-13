@@ -90,6 +90,7 @@ function Search() {
     var input = $("#input").val().toLowerCase().trim().split(" ");
     if (input != "" && input != " ") {
         var result = "";
+        var uniqueResults = [];
         for (var j = 0; j < input.length; j++) {
             $.ajax({
                 type: "POST",
@@ -99,7 +100,10 @@ function Search() {
                 dataType: "json",
                 success: function (data) {
                     for (var i = 0; i < data.d.length; i++) {
-                        result += data.d[i] + "<br />";
+                        if ($.inArray(data.d[i] + "<br />", uniqueResults) == -1) {
+                            result += data.d[i] + "<br />";
+                            uniqueResults.push(data.d[i] + "<br />");
+                        }
                     }
                     $("#searchResult").html(result);
                 }
