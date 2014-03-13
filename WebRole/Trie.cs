@@ -13,9 +13,6 @@ namespace WebRole
     {
         private Node root;
         private List<string> suggestions = new List<string>();
-        private static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["StorageConnectionString"]);
-        private static CloudTable statsTable = storageAccount.CreateCloudTableClient().GetTableReference("statstable");
-        private int counter = 0;
 
         public Trie()
         {
@@ -54,8 +51,6 @@ namespace WebRole
             else
             {
                 current.isWord = true;
-                //TableOperation word = TableOperation.InsertOrReplace(new Stats("trie", counter++.ToString()));
-                //statsTable.Execute(word);
             }
         }
 

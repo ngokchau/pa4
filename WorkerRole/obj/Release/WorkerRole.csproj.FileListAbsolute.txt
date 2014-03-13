@@ -43,3 +43,6 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\obj\Release\WorkerRole.csprojResolveAssemblyReference.cache
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\obj\Release\WorkerRole.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\obj\Release\WorkerRole.pdb
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\bin\Release\HtmlAgilityPack.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\bin\Release\HtmlAgilityPack.pdb
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WorkerRole\bin\Release\HtmlAgilityPack.xml

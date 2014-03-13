@@ -24,7 +24,10 @@ namespace WorkerRole
         private static CloudTable index;
         private static CloudQueue errorQueue;
         private static CloudQueue lastTenUrlQueue;
+        private static CloudTable crawlStatTable;
+        private static int crawlCounter;
         private static List<string> disallowedPaths;
+        private static HashSet<string> visited;
 
         public Crawler()
         {
@@ -34,7 +37,12 @@ namespace WorkerRole
             index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
             errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
             lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
+            crawlStatTable = storageAccount.CreateCloudTableClient().GetTableReference("krawlerstattable");
             disallowedPaths = new List<string>();
+            visited = new HashSet<string>();
+
+            crawlStatTable.CreateIfNotExists();
+            crawlCounter = (NumberOfUrlCrawled() != 0) ? NumberOfUrlCrawled() : 0;
         }
 
         public void Crawl(string url)
@@ -43,7 +51,7 @@ namespace WorkerRole
             {
                 try
                 {
-                    //string htmlRegex = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/([a-zA-Z\d\/\.\-]+|\.cnn\.html|\.html|\.wtvr\.html|[a-zA-Z\d]+\?[a-zA-Z\=a-zA-Z\&+\=a-zA-z0-9]+|)$";
+                    string htmlRegex = @"^(http|https):\/\/[a-zA-Z0-9\-\.]+\.cnn\.com\/([a-zA-Z\d\/\.\-]+|\.cnn\.html|\.html|\.wtvr\.html|[a-zA-Z\d]+\?[a-zA-Z\=a-zA-Z\&+\=a-zA-z0-9]+|)$";
                     HtmlDocument htmlDoc = new HtmlDocument();
 
                     htmlDoc.Load(WebRequest.Create(url).GetResponse().GetResponseStream());
@@ -58,15 +66,50 @@ namespace WorkerRole
                         TableOperation insertRecord = TableOperation.InsertOrReplace(new Result(word.ToLower(), HttpUtility.UrlEncode(url), date));
                         index.Execute(insertRecord);
                     }
+
+                    Uri uri = new Uri(url);
+                    HtmlNodeCollection links = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
+                    foreach (HtmlNode link in links)
+                    {
+                        string scheme = new Uri(uri, link.Attributes["href"].Value).Scheme.ToString();
+                        string host = new Uri(uri, link.Attributes["href"].Value).Host.ToString();
+                        string path = new Uri(uri, link.Attributes["href"].Value).PathAndQuery.ToString();
+                        string newUrl = scheme + "://" + host + path;
+                        
+                        if (!visited.Contains(newUrl))
+                        {
+                            if (Regex.Match(newUrl, htmlRegex).Success)
+                            {
+                                urlQueue.AddMessage(new CloudQueueMessage(newUrl));
+                            }
+                            visited.Add(newUrl);
+                        }
+                    }
+
+                    crawlCounter += 1;
+                    TableOperation insertCrawlStat = TableOperation.InsertOrReplace(new CrawlStat(crawlCounter.ToString()));
+                    crawlStatTable.Execute(insertCrawlStat);
+
                     LastUrlCrawled(url);
                 }
                 catch (Exception e)
                 {
                     Error(e);
                 }
-
-                // Add new links to url queue.
             }
+        }
+
+        private int NumberOfUrlCrawled()
+        {
+            TableQuery<CrawlStat> query = new TableQuery<CrawlStat>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "numberofurlcrawled"));
+            string result = "0";
+
+            foreach (CrawlStat stat in crawlStatTable.ExecuteQuery(query))
+            {
+                result = stat.counter;
+            }
+
+            return Convert.ToInt32(result);
         }
 
         private void Error(Exception error)

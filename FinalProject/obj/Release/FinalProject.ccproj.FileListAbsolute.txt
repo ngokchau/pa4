@@ -10,7 +10,6 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProjec
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\fr\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\fr\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\fr\System.Spatial.resources.dll
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\HtmlAgilityPack.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\it\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\it\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\it\System.Spatial.resources.dll
@@ -37,6 +36,7 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProjec
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\zh-Hant\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\zh-Hant\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\bin\zh-Hant\System.Spatial.resources.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\Chart.min.js
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\dashboard.html
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\dashboard.js
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WebRole\index.html
@@ -52,6 +52,8 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProjec
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\fr\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\fr\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\fr\System.Spatial.resources.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\HtmlAgilityPack.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\HtmlAgilityPack.pdb
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\it\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\it\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Release\WorkerRole\it\System.Spatial.resources.dll

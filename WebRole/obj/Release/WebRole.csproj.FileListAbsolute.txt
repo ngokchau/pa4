@@ -43,6 +43,3 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\bin
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\obj\Release\WebRole.csprojResolveAssemblyReference.cache
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\obj\Release\WebRole.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\obj\Release\WebRole.pdb
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\bin\HtmlAgilityPack.dll
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\bin\HtmlAgilityPack.pdb
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\WebRole\bin\HtmlAgilityPack.xml

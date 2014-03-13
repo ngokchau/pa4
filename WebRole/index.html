@@ -15,32 +15,33 @@
         <br />
         <br />
         <div class="row">
-            <div class="col-xs-12 col-sm-8">
+            <div class="col-xs-12 col-sm-12">
                 <div class="input-group">
                     <input type="text" class="form-control" name='input' id='input' placeholder='Search'>
                     <span class="input-group-btn">
                         <button class="btn btn-success" type="button" id='search'>Search</button>
                     </span>
                 </div>
+                <div id="suggestion"></div>
             </div>
         </div>
-        <br>
+        <br />
         <div class="row">
-            <div class="col-xs-12 col-sm-8" id="structureDataResult">
+            <div class="col-xs-12 col-md-8" id="searchResult">
+                <!-- data goes here -->
+            </div>
+            <div class="col-xs-12 col-md-4" id="structureData">
+                <div class='panel panel-default'>
+                    <div class='panel-heading' id='structureDataPlayerName'></div>
+                    <div class='panel-body' id="structureDataPlayerStats">
+                        <!-- player stats goes here -->
+                    </div>
+                </div>
                 <!-- data goes here -->
             </div>
         </div>
         <br>
         <div class="row">
-            <div class="col-xs-12 col-sm-8" id="suggestion">
-                <!-- data goes here -->
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-xs-12 col-sm-8" id="searchResult">
-                <!-- data goes here -->
-            </div>
         </div>
     </div>
 </body>

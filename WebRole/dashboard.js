@@ -14,21 +14,32 @@
         AddCommand("load");
     })
     $("#clearUrlQueue").click(function () {
-        ClearUrlQueue();
+        ClearQueue("url");
     });
     $("#addError").click(function () {
         AddError();
     });
     $("#clearErrors").click(function () {
-        ClearErrors();
+        ClearQueue("error");
+    });
+    $("#clearUrlsCrawled").click(function () {
+        ClearQueue("urlsCrawled")
+    });
+    $("#resetNumberofUrlCrawled").click(function () {
+        ResetNumberUrlCrawled();
+    });
+    $("#resetIndex").click(function () {
+        ResetIndex();
     });
 });
 
 function loop() {
     GetPerformance("Memory", "Available MBytes", "");
     GetPerformance("Processor", "% Processor Time", "_Total");
-    GetNoWordsInTrie();
     GetStateOfWorker();
+    GetTrieStat("number of lines");
+    GetTrieStat("last line");
+    GetNumbUrlCrawled();
     ToggleBuildTrie();
     GetUrlQueueSize();
     GetLastTen("errors");
@@ -44,7 +55,14 @@ function GetPerformance(category, counter, instance) {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            (category == "Processor") ? $("#cpu").html(JSON.parse(data.d)) : $("#ram").html(JSON.parse(data.d));
+            if (category == "Processor")
+            {
+                $("#cpu").html("CPU: " + JSON.parse(data.d));
+            }
+            else
+            {
+                $("#ram").html("RAM: " + JSON.parse(data.d));
+            }
         }
     });
 }
@@ -53,7 +71,11 @@ function BuildTrie() {
     $.ajax({
         type: "POST",
         url: "admin.asmx/BuildTrie",
-        contentType: "application/json; charset=utf-8"
+        contentType: "application/json; charset=utf-8",
+        success: function () {
+            GetTrieStat("number of lines");
+            GetTrieStat("last line");
+        }
     });
 }
 
@@ -61,14 +83,27 @@ function ToggleBuildTrie() {
     ($("#ram").html() < 200) ? $("#buildTrie").addClass("disabled") : $("#buildTrie").removeClass("disabled");
 }
 
-function GetNoWordsInTrie() {
+function GetTrieStat(stat) {
     $.ajax({
         type: "POST",
-        url: "admin.asmx/GetNoWordsInTrie",
+        url: "admin.asmx/GetTrieStat",
+        data: JSON.stringify({ type: stat }),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            $("#noWordsInTrie").html(JSON.parse(data.d));
+            (stat == "last line") ? $("#lastLineInsertToTrie").html("Last Entry: " + JSON.parse(data.d)) : $("#numberOfLinesInsertToTrie").html("# Entries: " +JSON.parse(data.d));
+        }
+    });
+}
+
+function GetNumbUrlCrawled() {
+    $.ajax({
+        type: "POST",
+        url: "admin.asmx/GetNumbUrlCrawled",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            $("#numberOfUrlCrawled").html("# Url Crawled: " + JSON.parse(data.d));
         }
     });
 }
@@ -100,6 +135,22 @@ function AddCommand(cmd) {
     })
 }
 
+function ResetNumberUrlCrawled() {
+    $.ajax({
+        type: "POST",
+        url: "admin.asmx/ResetNumbUrlCrawled",
+        contentType: "application/json; charset=utf-8",
+    });
+}
+
+function ResetIndex() {
+    $.ajax({
+        type: "POST",
+        url: "admin.asmx/ResetIndex",
+        contentType: "application/json; charset=utf-8",
+    });
+}
+
 function GetUrlQueueSize() {
     $.ajax({
         type: "POST",
@@ -108,14 +159,6 @@ function GetUrlQueueSize() {
         success: function (data) {
             $("#urlQueueSize").html(JSON.parse(data.d));
         }
-    });
-}
-
-function ClearUrlQueue() {
-    $.ajax({
-        type: "POST",
-        url: "admin.asmx/ClearUrlQueue",
-        contentType: "application/json; charset=utf-8"
     });
 }
 
@@ -144,10 +187,11 @@ function AddError() {
     });
 }
 
-function ClearErrors() {
+function ClearQueue(queue) {
     $.ajax({
         type: "POST",
-        url: "admin.asmx/ClearErrors",
+        url: "admin.asmx/ClearQueue",
+        data: JSON.stringify({ queue: queue }),
         contentType: "application/json; charset=utf-8"
     });
 }

@@ -51,6 +51,8 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProjec
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\fr\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\fr\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\fr\System.Spatial.resources.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\HtmlAgilityPack.dll
+C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\HtmlAgilityPack.pdb
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\it\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\it\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\it\System.Spatial.resources.dll
@@ -79,5 +81,3 @@ C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProjec
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\zh-Hant\Microsoft.Data.Edm.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\zh-Hant\Microsoft.Data.OData.resources.dll
 C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\zh-Hant\System.Spatial.resources.dll
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\HtmlAgilityPack.dll
-C:\Users\Chau\Documents\Visual Studio 2013\Projects\Web\FinalProject\FinalProject\obj\Debug\WorkerRole\HtmlAgilityPack.pdb

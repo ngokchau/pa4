@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -35,6 +36,9 @@ namespace WebRole
         private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
         private static CloudQueue lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
         private static CloudTable index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
+        private static CloudTable statTable = storageAccount.CreateCloudTableClient().GetTableReference("krawlerstat");
+        private static CloudTable crawlStatTable = storageAccount.CreateCloudTableClient().GetTableReference("krawlerstattable");
+        private static Dictionary<string, List<string>> cache = new Dictionary<string, List<string>>();
 
         [WebMethod]
         public void BuildTrie()
@@ -42,13 +46,44 @@ namespace WebRole
             trie = new Trie();
             CloudBlockBlob wikidata = storageAccount.CreateCloudBlobClient().GetContainerReference("querysuggestion").GetBlockBlobReference("clean-wiki-full.txt");
             StreamReader sr = new StreamReader(wikidata.OpenRead());
+            int lineCounter = 1;
+            string lastLine = "...";
 
-            int counter = 1;
-            while (!sr.EndOfStream && (counter % 50000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 70))
+            while (!sr.EndOfStream && (lineCounter % 25000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 60))
             {
-                trie.Insert(sr.ReadLine());
-                counter++;
+                lastLine = sr.ReadLine();
+                trie.Insert(lastLine);
+                lineCounter++;
             }
+
+            TableOperation insertTrieStat = TableOperation.InsertOrReplace(new TrieStat("trie", lastLine, lineCounter.ToString()));
+            statTable.CreateIfNotExists();
+            statTable.Execute(insertTrieStat);
+        }
+
+        [WebMethod]
+        public void InsertToTrie(string word)
+        {
+            if (trie == null)
+            {
+                BuildTrie();
+            }
+            trie.Insert(word);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string GetTrieStat(string type)
+        {
+            TableQuery<TrieStat> query = new TableQuery<TrieStat>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "trie"));
+            string result = "";
+            
+            foreach (TrieStat stat in statTable.ExecuteQuery(query))
+            {
+                result = (type == "last line") ? stat.last : stat.size;
+            }
+
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [WebMethod]
@@ -66,32 +101,69 @@ namespace WebRole
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public List<string> Search(string input)
         {
-            TableQuery<Result> query = new TableQuery<Result>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, input));
-            List<string> results = new List<string>();
-            
-            foreach (Result result in index.ExecuteQuery(query))
+            if (cache.Count > 20)
             {
-                results.Add(HttpUtility.UrlDecode(result.url));
+                cache.Clear();
             }
+            if (!cache.ContainsKey(input))
+            {
+                try
+                {
+                    TableQuery<Result> query = new TableQuery<Result>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, input));
+                    List<string> results = new List<string>();
 
-            return results;
+                    foreach (Result result in index.ExecuteQuery(query))
+                    {
+                        results.Add(HttpUtility.UrlDecode(result.url));
+                    }
+
+                    cache.Add(input, results);
+                    return results;
+                }
+                catch (Exception e)
+                {
+                    AddError(e);
+                }
+            }
+            return cache[input];
+
         }
 
-        //[WebMethod]
-        //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        //public string GetNumbUrlCrawled()
-        //{
-        //    statTable.CreateIfNotExists();
-        //    TableQuery<Stat> query = new TableQuery<Stat>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "numburlcrawled"));
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string GetNumbUrlCrawled()
+        {
+            TableQuery<CrawlStat> query = new TableQuery<CrawlStat>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "numberofurlcrawled"));
+            string result = "0";
 
-        //    string result = "0";
-        //    foreach (Stat stat in statTable.ExecuteQuery(query))
-        //    {
-        //        result = stat.counter;
-        //    }
+            foreach (CrawlStat stat in crawlStatTable.ExecuteQuery(query))
+            {
+                result = stat.counter;
+            }
 
-        //    return new JavaScriptSerializer().Serialize(result);
-        //}
+            return new JavaScriptSerializer().Serialize(result);
+        }
+
+        [WebMethod]
+        public void ResetNumbUrlCrawled()
+        {
+            TableOperation insertCrawlStat = TableOperation.InsertOrReplace(new CrawlStat("0"));
+            crawlStatTable.Execute(insertCrawlStat);
+        }
+
+        [WebMethod]
+        public void ResetIndex()
+        {
+            try
+            {
+                index.Delete();
+                index.CreateIfNotExists();
+            }
+            catch (Exception e)
+            {
+                AddError(e);
+            }
+        }
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -142,12 +214,6 @@ namespace WebRole
         }
 
         [WebMethod]
-        public void ClearUrlQueue()
-        {
-            urlQueue.Clear();
-        }
-
-        [WebMethod]
         public List<string> GetLastTen(string type)
         {
             IEnumerable<CloudQueueMessage> msgs = (type == "errors") ? errorQueue.PeekMessages(10) : lastTenUrlQueue.PeekMessages(10);
@@ -162,20 +228,31 @@ namespace WebRole
         }
 
         [WebMethod]
-        public void AddError()
+        public void AddError(Exception e)
         {
             errorQueue.FetchAttributes();
             if (errorQueue.ApproximateMessageCount >= 10)
             {
                 errorQueue.DeleteMessage(errorQueue.GetMessage());
             }
-            errorQueue.AddMessage(new CloudQueueMessage("Error " + DateTime.UtcNow.ToString()));
+            errorQueue.AddMessage(new CloudQueueMessage(e + " " + DateTime.UtcNow.ToString()));
         }
 
         [WebMethod]
-        public void ClearErrors()
+        public void ClearQueue(string queue)
         {
-            errorQueue.Clear();
+            switch (queue)
+            {
+                case "error":
+                    errorQueue.Clear();
+                    break;
+                case "url":
+                    urlQueue.Clear();
+                    break;
+                case "urlsCrawled":
+                    lastTenUrlQueue.Clear();
+                    break;
+            }
         }
     }
 }

@@ -19,31 +19,39 @@ namespace WorkerRole
 {
     public class WorkerRole : RoleEntryPoint
     {
-        private static CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
-        private static CloudQueue cmdQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlercmd");
-        private static CloudQueue urlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlerurl");
-        private static CloudQueue errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
-        private static CloudQueue lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
-        private static CloudTable index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
-        private static HashSet<string> visisted = new HashSet<string>();
+        private static CloudStorageAccount storageAccount;
+        private static CloudQueue cmdQueue;
+        private static CloudQueue urlQueue;
+        private static CloudQueue errorQueue;
+        private static CloudQueue lastTenUrlQueue;
+        private static CloudTable index;
+        private static HashSet<string> visisted;
 
         public override void Run()
         {
-            // This is a sample worker implementation. Replace with your logic.
-            Trace.TraceInformation("WorkerRole entry point called", "Information");
+            storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            cmdQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlercmd");
+            urlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlerurl");
+            errorQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("krawlererror");
+            lastTenUrlQueue = storageAccount.CreateCloudQueueClient().GetQueueReference("lasttenurlcrawled");
+            index = storageAccount.CreateCloudTableClient().GetTableReference("krawlerindex");
+            visisted = new HashSet<string>();
 
             cmdQueue.CreateIfNotExists();
             urlQueue.CreateIfNotExists();
             errorQueue.CreateIfNotExists();
             lastTenUrlQueue.CreateIfNotExists();
 
+            // This is a sample worker implementation. Replace with your logic.
+            Trace.TraceInformation("WorkerRole entry point called", "Information");
+
             Crawler crawler = new Crawler();
-            cmdQueue.Clear();
-            cmdQueue.AddMessage(new CloudQueueMessage("stop"));
+            //cmdQueue.Clear();
+            //cmdQueue.AddMessage(new CloudQueueMessage("stop"));
 
             while (true)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
                 Trace.TraceInformation("Working", "Information");
 
                 CloudQueueMessage cmd = cmdQueue.PeekMessage();
@@ -59,11 +67,16 @@ namespace WorkerRole
                         crawler.Crawl(url.AsString);
                         visisted.Add(url.AsString);
                     }
+
                     urlQueue.DeleteMessage(url);
+                }
+                else if(cmd.AsString == "load" && urlQueue.PeekMessage() == null)
+                {
+                    crawler.LoadQueue("http://www.cnn.com");
                 }
                 else
                 {
-                    crawler.LoadQueue("http://www.cnn.com");
+                    continue;
                 }
             }
         }

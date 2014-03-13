@@ -7,22 +7,49 @@
 
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.0.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="Chart.min.js"></script>
     <script src="dashboard.js"></script>
 
 </head>
 <body>
-    <div id="ram"></div>
-    <div id="cpu"></div>
-    <button class="btn btn-success" id="buildTrie">Build Trie</button>
-    <div id="crawlerState"></div>
-    <button class="btn btn-success" id="startCrawler">Start Crawler</button>
-    <button class="btn btn-danger" id="stopCrawler">Stop Crawler</button>
-    <div id="urlQueueSize"></div>
-    <button class="btn btn-success" id="loadUrlQueue">Load Url Queue</button>
-    <button class="btn btn-danger" id="clearUrlQueue">Clear Url Queue</button>
-    <div id="errors"></div>
-    <!--<button class="btn btn-success disabled" id="addError">Add Error</button>-->
-    <button class="btn btn-danger" id="clearErrors">Clear Errors</button>
-    <div id="urlsCrawled"></div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <h4 id="ram"></h4>
+                <h4 id="cpu"></h4>
+                <h4 id="numberOfUrlCrawled"></h4>
+                <h4 id="numberOfLinesInsertToTrie"></h4>
+                <h4 id="lastLineInsertToTrie"></h4>
+                <!--<button class="btn btn-success" id="buildTrie">Build Trie</button>-->
+            </div>
+        </div>
+
+
+        <div id="crawlerState"></div>
+        <button class="btn btn-success" id="startCrawler">Start Crawler</button>
+        <button class="btn btn-danger" id="stopCrawler">Stop Crawler</button>
+        <button class="btn btn-danger" id="resetNumberofUrlCrawled">Reset Number of Url Crawled</button>
+        <hr />
+
+        <div id="urlQueueSize"></div>
+        <button class="btn btn-success" id="loadUrlQueue">Load Url Queue</button>
+        <button class="btn btn-danger" id="clearUrlQueue">Clear Url Queue</button>
+        <hr />
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div id="urlsCrawled" style="white-space: nowrap; overflow: hidden;"></div>
+                <button class="btn btn-danger" id="clearUrlsCrawled">Clear Crawl Log</button>
+            </div>
+            <div class="col-lg-6">
+                <div id="errors" style="white-space: nowrap; overflow: hidden;"></div>
+                <!--<button class="btn btn-success disabled" id="addError">Add Error</button>-->
+                <button class="btn btn-danger" id="clearErrors">Clear Errors</button>
+            </div>
+        </div>
+        <br />
+        <button class="btn btn-danger" id="resetIndex">Reset Index</button>
+    </div>
 </body>
 </html>
