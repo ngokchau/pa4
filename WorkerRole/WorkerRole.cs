@@ -45,7 +45,7 @@ namespace WorkerRole
             // This is a sample worker implementation. Replace with your logic.
             Trace.TraceInformation("WorkerRole entry point called", "Information");
 
-            //Crawler crawler = new Crawler();
+            Crawler crawler = new Crawler();
             //cmdQueue.Clear();
             //cmdQueue.AddMessage(new CloudQueueMessage("stop"));
 
@@ -59,21 +59,21 @@ namespace WorkerRole
                 {
                     continue;
                 }
-                //else if (cmd.AsString == "start")
-                //{
-                //    CloudQueueMessage url = urlQueue.GetMessage();
-                //    if (!visisted.Contains(url.AsString))
-                //    {
-                //        crawler.Crawl(url.AsString);
-                //        visisted.Add(url.AsString);
-                //    }
+                else if (cmd.AsString == "start")
+                {
+                    CloudQueueMessage url = urlQueue.GetMessage();
+                    if (!visisted.Contains(url.AsString))
+                    {
+                        crawler.Crawl(url.AsString);
+                        visisted.Add(url.AsString);
+                    }
 
-                //    urlQueue.DeleteMessage(url);
-                //}
-                //else if(cmd.AsString == "load" && urlQueue.PeekMessage() == null)
-                //{
-                //    crawler.LoadQueue("http://www.cnn.com");
-                //}
+                    urlQueue.DeleteMessage(url);
+                }
+                else if (cmd.AsString == "load" && urlQueue.PeekMessage() == null)
+                {
+                    crawler.LoadQueue("http://www.cnn.com");
+                }
                 else
                 {
                     continue;

@@ -60,7 +60,7 @@ function QuerySuggestion() {
             if (input != "" && input != " " && input.charAt(0) == data.d[0].charAt(0)) {
                 for (var i = 0; i < data.d.length; i++) {
                     if (i == 0) {
-                        result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');QueryAws();Search();\" SELECTED>" + data.d[i] + "</option>";
+                        result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');QueryAws();Search();\" sel>" + data.d[i] + "</option>";
                     }
                     else {
                         result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');QueryAws();Search();\">" + data.d[i] + "</option>";
@@ -89,7 +89,7 @@ function InsertToTrie() {
 function Search() {
     var input = $("#input").val().toLowerCase().trim().split(" ");
     if (input != "" && input != " ") {
-        var uniqueResults = [];
+        var result = "";
         for (var j = 0; j < input.length; j++) {
             $.ajax({
                 type: "POST",
@@ -98,12 +98,8 @@ function Search() {
                 data: JSON.stringify({ input: input[j] }),
                 dataType: "json",
                 success: function (data) {
-                    var result = "";
                     for (var i = 0; i < data.d.length; i++) {
-                        if (!(data.d[i] + "<br />" in uniqueResults)) {
-                            uniqueResults.push(data.d[i] + "<br />");
-                            result += data.d[i] + "<br />";
-                        }
+                        result += data.d[i] + "<br />";
                     }
                     $("#searchResult").html(result);
                 }

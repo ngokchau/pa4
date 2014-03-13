@@ -49,16 +49,16 @@ namespace WebRole
             int lineCounter = 1;
             string lastLine = "...";
 
-            while (!sr.EndOfStream && (lineCounter % 25000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 3300))
+            while (!sr.EndOfStream && (lineCounter % 25000 != 0 || Convert.ToInt32(GetPerformance("Memory", "Available MBytes", "")) > 50))
             {
                 lastLine = sr.ReadLine();
                 trie.Insert(lastLine);
                 lineCounter++;
             }
 
-            //TableOperation insertTrieStat = TableOperation.InsertOrReplace(new TrieStat("trie", lastLine, lineCounter.ToString()));
-            //statTable.CreateIfNotExists();
-            //statTable.Execute(insertTrieStat);
+            TableOperation insertTrieStat = TableOperation.InsertOrReplace(new TrieStat("trie", lastLine, lineCounter.ToString()));
+            statTable.CreateIfNotExists();
+            statTable.Execute(insertTrieStat);
         }
 
         [WebMethod]
@@ -101,7 +101,7 @@ namespace WebRole
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public List<string> Search(string input)
         {
-            if (cache.Count > 20)
+            if (cache.Count > 100)
             {
                 cache.Clear();
             }

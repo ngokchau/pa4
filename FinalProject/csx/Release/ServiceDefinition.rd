@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<serviceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FinalProject" generation="1" functional="0" release="0" Id="9de40639-47c7-400f-b5fb-a2d50e80e72b" dslVersion="1.2.0.0" xmlns="http://schemas.microsoft.com/dsltools/RDSM">
+<serviceModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FinalProject" generation="1" functional="0" release="0" Id="a58a94c5-bf19-4c55-9dda-797a1cc9dfb1" dslVersion="1.2.0.0" xmlns="http://schemas.microsoft.com/dsltools/RDSM">
   <groups>
     <group name="FinalProjectGroup" generation="1" functional="0" release="0">
       <componentports>
@@ -110,9 +110,9 @@
     </group>
   </groups>
   <implements>
-    <implementation Id="02e29ec9-6baa-428a-ac2a-d33e673fc413" ref="Microsoft.RedDog.Contract\ServiceContract\FinalProjectContract@ServiceDefinition">
+    <implementation Id="6e43aa9e-5b35-426d-a7af-a26ba75b1cd8" ref="Microsoft.RedDog.Contract\ServiceContract\FinalProjectContract@ServiceDefinition">
       <interfacereferences>
-        <interfaceReference Id="5e2140ee-b1bb-4fcf-8e73-b3591cad64d2" ref="Microsoft.RedDog.Contract\Interface\WebRole:Endpoint1@ServiceDefinition">
+        <interfaceReference Id="a49a9a37-d77b-4f9c-af6f-6306e65d93ef" ref="Microsoft.RedDog.Contract\Interface\WebRole:Endpoint1@ServiceDefinition">
           <inPort>
             <inPortMoniker name="/FinalProject/FinalProjectGroup/WebRole:Endpoint1" />
           </inPort>

@@ -56,10 +56,15 @@ function QuerySuggestion() {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            var result = "<select multiple class=\"form-control\" style=\"z-index: 9999; position: absolute; width: 92.7%; height: 190px\">";
+            var result = "<select multiple size=\"" + data.d.length + "\" class=\"form-control\" style=\"z-index: 9999; position: absolute; width: 92.7%;\">";
             if (input != "" && input != " " && input.charAt(0) == data.d[0].charAt(0)) {
                 for (var i = 0; i < data.d.length; i++) {
-                    result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');Search();QueryAws();\">" + data.d[i] + "</option>";
+                    if (i == 0) {
+                        result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');QueryAws();Search();\" sel>" + data.d[i] + "</option>";
+                    }
+                    else {
+                        result += "<option onclick=\"$('#input').val(this.value);$('#suggestion').html('');QueryAws();Search();\">" + data.d[i] + "</option>";
+                    }
                 }
                 $("#suggestion").html(result + "</select>");
             }
@@ -84,7 +89,7 @@ function InsertToTrie() {
 function Search() {
     var input = $("#input").val().toLowerCase().trim().split(" ");
     if (input != "" && input != " ") {
-        var uniqueResults = [];
+        var result = "";
         for (var j = 0; j < input.length; j++) {
             $.ajax({
                 type: "POST",
@@ -93,12 +98,8 @@ function Search() {
                 data: JSON.stringify({ input: input[j] }),
                 dataType: "json",
                 success: function (data) {
-                    var result = "";
                     for (var i = 0; i < data.d.length; i++) {
-                        if (!(data.d[i] + "<br />" in uniqueResults)) {
-                            uniqueResults.push(data.d[i] + "<br />");
-                            result += data.d[i] + "<br />";
-                        }
+                        result += data.d[i] + "<br />";
                     }
                     $("#searchResult").html(result);
                 }
